@@ -4,7 +4,7 @@ bin/
 
 #Eclipse Project Files
 *.project
-
+*.classpath
 
 # Log file
 *.log
