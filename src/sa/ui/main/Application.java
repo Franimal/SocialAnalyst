@@ -76,7 +76,7 @@ public class Application {
 	public static void main(String[] args){	
 		Application app = new Application();
 //		TwitterCriteria c = TwitterCriteria.create();
-//		c.setMaxTweets(10);
+//		c.setMaxTweets(50);
 //	
 //		c.setSince("2016-1-22");
 //		c.setUntil("2016-12-22");
@@ -95,7 +95,7 @@ public class Application {
 //			System.out.println(t.getPermalink());
 //			System.out.println(t.getGeo());
 //		}
-	
+//	
 		
 	}
 	
