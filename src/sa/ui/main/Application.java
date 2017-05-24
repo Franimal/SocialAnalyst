@@ -2,9 +2,13 @@ package sa.ui.main;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.List;
 
 import javax.swing.JFrame;
 
+import sa.social.twitter.Tweet;
+import sa.social.twitter.TweetManager;
+import sa.social.twitter.TwitterCriteria;
 import sa.ui.header.HeaderPanel;
 import sa.ui.map.MapPanel;
 import sa.ui.timeline.TimelinePanel;
@@ -69,8 +73,30 @@ public class Application {
 		mainFrame.pack();
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args){	
 		Application app = new Application();
+//		TwitterCriteria c = TwitterCriteria.create();
+//		c.setMaxTweets(10);
+//	
+//		c.setSince("2016-1-22");
+//		c.setUntil("2016-12-22");
+//		c.setQuerySearch("geocode:-41.306482,174.777157,10km");
+//		
+//		System.out.println("Gathering tweets..");
+//		
+//		long start = System.currentTimeMillis();
+//		List<Tweet> tweets = TweetManager.getTweets(c);
+//		long end = System.currentTimeMillis();
+//		System.out.println("Execution time: " + (end-start));
+//		System.out.println(tweets.size() + " tweets found.");
+//		System.out.println("Filtering tweets..");
+//		for(Tweet t : tweets){
+//			System.out.println(t.getText());
+//			System.out.println(t.getPermalink());
+//			System.out.println(t.getGeo());
+//		}
+	
+		
 	}
 	
 }
