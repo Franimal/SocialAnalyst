@@ -1,18 +1,20 @@
 package sa.social.twitter;
 
+/**
+ * This class represents a set of search criteria.  Contains all the information needed to make a simple twitter search query.
+ * @author Tim
+ *
+ */
 public class TwitterCriteria {
 	
 	private String username;
-	
 	private String since;
-	
 	private String until;
-	
 	private String querySearch;
-	
 	private int maxTweets;
 	
 	private TwitterCriteria() {
+		
 	}
 
 	public static TwitterCriteria create() {
@@ -20,7 +22,7 @@ public class TwitterCriteria {
 	}
 
 	/**
-	 * @param username (whitout @) Username of a specific twitter account
+	 * @param username (without @) Username of a specific twitter account
 	 * 
 	 * @return Current {@link TwitterCriteria}
 	 */

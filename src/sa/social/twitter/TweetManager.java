@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -21,10 +20,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import sa.core.Coordinate;
+
 /**
- * Class to getting tweets based on username and optional time constraints
+ * Class for getting tweets based on various attributes.
  * 
- * @author Jefferson Henrique
+ * Multiple tweets can be gathered from different geographical locations using #getMultipleGeoTweets.
+ * 
  */
 public class TweetManager {
 	
@@ -32,8 +34,61 @@ public class TweetManager {
 	
 	static {
 		Logger.getLogger("org.apache.http").setLevel(Level.OFF);
+		
 	}
 
+	/**
+	 * Requests tweets matching the given TwitterCriteria from each of the locations given in 'coordinates'.
+	 * @param criteria The criteria to search for at each location
+	 * @param coordinates A list of all coordinates to get data from
+	 * @param radiusKM The radius around each location to get data from.
+	 * @param threadPoolSize The amount of threads to use in the pool.
+	 * @return
+	 */
+	public static List<Tweet> getMultipleGeoTweets(TwitterCriteria criteria, List<Coordinate> coordinates, int radiusKM, int threadPoolSize){
+		List<TwitterCriteria> criterias = new ArrayList<>();
+		for(Coordinate c : coordinates){
+			TwitterCriteria crit = TwitterCriteria.create();
+			crit.setMaxTweets(criteria.getMaxTweets());
+			crit.setSince(criteria.getSince());
+			crit.setUntil(criteria.getUntil());
+			crit.setUsername(criteria.getUsername());
+			
+			StringBuilder query = new StringBuilder(criteria.getQuerySearch());
+			query.append(" geocode:" + c.getLatitude() + "," + c.getLongitude() + "," + radiusKM + "km");
+			crit.setQuerySearch(query.toString());
+			criterias.add(crit);
+			System.out.println(crit.getQuerySearch());
+		}
+		
+		TwitterGeoRequestNode[] threads = new TwitterGeoRequestNode[threadPoolSize];
+		for(int i = 0; i < threads.length; i++){
+			threads[i] = new TwitterGeoRequestNode();
+ 		}
+		
+		boolean threadsRunning = true;
+		List<Tweet> tweets = new ArrayList<>();
+		while(threadsRunning){
+			threadsRunning = false;
+			for(int i = 0; i < threads.length; i++){
+				if(threads[i].hasTweets()){
+					tweets.addAll(threads[i].consumeTweets());
+				}
+				if(threads[i].isReady()){
+					if(!criterias.isEmpty()){
+						threadsRunning = true;
+						threads[i].requestInfo(criterias.remove(0));
+					}
+				} else {
+					threadsRunning = true;
+				}
+			}
+		}
+		
+		return tweets;
+		
+	}
+	
 	/**
 	 * @param username A specific username (without @)
 	 * @param since Lower bound date (yyyy-mm-dd)
@@ -60,6 +115,7 @@ public class TweetManager {
 		String url = String.format("https://twitter.com/i/search/timeline?f=realtime&q=%s&src=typd&max_position=%s", URLEncoder.encode(appendQuery, "UTF-8"), scrollCursor);
 		
 		HttpGet httpGet = new HttpGet(url);
+
 		HttpEntity resp = defaultHttpClient.execute(httpGet).getEntity();
 		
 		return EntityUtils.toString(resp);
@@ -76,11 +132,13 @@ public class TweetManager {
 		try {
 			String refreshCursor = null;
 			outerLace: while (true) {
+				
 				JSONObject json = new JSONObject(getURLResponse(criteria.getUsername(), criteria.getSince(), criteria.getUntil(), criteria.getQuerySearch(), refreshCursor));
+				
 				refreshCursor = json.getString("min_position");
 				Document doc = Jsoup.parse((String) json.get("items_html"));
 				Elements tweets = doc.select("div.js-stream-tweet");
-				
+	
 				if (tweets.size() == 0) {
 					break;
 				}
@@ -99,7 +157,7 @@ public class TweetManager {
 					if (geoElement.size() > 0) {
 						geo = geoElement.attr("title");
 					}
-
+					
 					Date date = new Date(dateMs);
 					
 					Tweet t = new Tweet();
@@ -124,7 +182,7 @@ public class TweetManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return results;
 	}
 	

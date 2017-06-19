@@ -3,33 +3,24 @@ package sa.social.twitter;
 import java.util.Date;
 
 /**
- * Model class to helps users getting info about an specific tweet
- * 
- * @author Jefferson
+ * Represents a single tweet.
+ * @author Tim
  */
 public class Tweet {
 	
 	private String id;
-	
 	private String permalink;
-	
 	private String username;
-	
 	private String text;
-	
 	private Date date;
-	
 	private int retweets;
-
 	private int favorites;
-	
 	private String mentions;
-	
 	private String hashtags;
-	
 	private String geo;
 	
 	public Tweet() {
+		
 	}
 
 	public String getId() {
